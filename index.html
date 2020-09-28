@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Title</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  </head>
+  <body>
+      <h1>i have done my first mongo file</h1>
+      <form action="/addProduct" method="POST">
+    <input type="text" placeholder="Name" name="Name">
+    <input type="text" placeholder="Price" name="Price">
+    <input type="text" placeholder="quantity" name="quantity">
+    <button class="btn btn-primary">Add Product</button>
+    </form>
+    <div id="products">
+
+    </div>
+    <div id="update">
+      
+    </div>
+    <script>
+        fetch('/product')
+        .then(res=> res.json())
+        .then(data=>{
+            
+           const container = document.getElementById("products");
+           
+           data.forEach(pd => {
+               
+            const p = document.createElement("p");
+            p.innerHTML = ` ${pd.Name}  Price : ${pd.Price}   Quantity :  ${pd.quantity} 
+            <button onclick= "loadProduct('${pd._id}')" >Update</button>
+              <button onclick = "deleteProduct('${pd._id}')"> Remove </button>` ;
+            container.appendChild(p);               
+           });
+           
+           function loadProduct(id){
+             fetch(`/singleProduct/${id}`)
+             .then(res=> res.json())
+             .then(data=> {
+              const update = document.getElementById("update");
+                  update.innerHTML =`
+                  <h3>Update: ${data._id}</h3>
+                 Price : <input type="text" value ="${data.Price}" id="price">
+                 <br>
+                 Quantity : <input type="text" value ="${data.quantity}" id="quantity">
+                 <br>
+                 <button onclick="updateProduct('${data._id}')">Submit</button>
+                  `
+             });
+           }
+          function updateProduct(id){
+            const price = document.getElementById("price").value;
+            const quantity = document.getElementById('quantity').value;
+            const product ={id,price,quantity};
+            fetch(`/update/${id}`,{
+              method :"PATCH",
+              headers:{'Content-Type':'application/json'},
+              body: JSON.stringify(product)
+            })
+            .then(res=> res.json())
+            .then(data=>{
+              console.log(data);
+            })
+
+           }
+          function deleteProduct(id){
+                fetch(`/delete/${id}`,{
+                    method:"DELETE"
+                })
+                .then(res=>res.json())
+                .then(data=>{
+                    console.log(data)
+                })
+           }
+        })
+    </script>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+  </body>
+</html>
